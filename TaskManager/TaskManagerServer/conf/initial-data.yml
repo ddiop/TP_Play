@@ -1,0 +1,10 @@
+# Users
+
+users:
+
+  - !!models.UserAccount
+        id:       1
+        mail:     antoine@sample.com
+        nickname: djibi
+        password: secret
+

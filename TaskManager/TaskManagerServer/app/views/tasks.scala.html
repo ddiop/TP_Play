@@ -1,0 +1,85 @@
+@(tasks: List[Task], taskForm: Form[Task])
+
+
+@import helper._
+
+@main("See All Tasks") {
+    
+ <h1>@tasks.size() task(s)</h1>
+Bonjour : @session.get("nickname")
+    <ul>
+        @for(task <- tasks) {
+            <li>
+                @task.getLabel priority : @task.getPriority person : @task.getUser.getNickname 
+                @if(task.getProject!=null) {
+                	project : @task.getProject.getLabel
+                	}
+                
+                @form(routes.Application.deleteTask(task.getId)) {
+                    <input type="submit" value="Delete">
+                }
+            </li>
+        }
+    </ul>
+    
+    <h2>Add a new task</h2>
+    
+    @form(routes.Application.newTask()) {
+        
+        @inputText(taskForm("label"), '_label -> "Nom de la tâche")
+        @inputText(taskForm("priority"))
+        Project :
+        @select(taskForm("project.id"), 
+        		options(Project.options()),
+        		'_default -> "--- Choose a project ---",
+                '_label -> "Project",
+                '_error -> taskForm("project").error.map(_.withMessage("Please select your project"))
+        		)
+  
+        User : 
+        @select(taskForm("user.id"), 
+        		options(UserAccount.options()),
+        		'_default -> "--- Choose a user ---",
+                '_label -> "User",
+                '_error -> taskForm("user").error.map(_.withMessage("Please select your userAccount"))
+        		)
+        <input id="creer" type="submit" value="Create">
+        <script type="text/javascript">
+        $(document).ready(function(){
+        	
+        	var bt= $("#creer");
+        	
+        	
+        	bt.click(function(e){
+        		e.preventDefault();
+        		var label=$("#label").val();
+            	var priority=$("#priority").val();
+            	var user=$("#user_id").val();
+            	var project=$("#project_id").val();
+            	var json={"label":label,"priority":priority,"user_id":user,"project_id":project};
+            	
+        		//console.log("test");
+        		//console.log(json);
+        		$.ajax({
+        			
+        			"contentType":"application/json",
+    	        	"url":"http://localhost:9000/tasks_ajax",
+    	        	
+    	        	"type":"POST",
+    	        	"data":JSON.stringify(json),
+    	        		"succes":function(data){
+    	        			console.log(json);
+    	        	}
+        		
+    	        });
+        		
+        	});
+        });
+       
+        
+		 
+        </script>
+        
+    }   
+    
+}
